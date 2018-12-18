@@ -27,14 +27,13 @@ function setup(options = {}) {
   let hits = []
   let hitIndex = 0
   let query = ''
-  let queryRegex = null
 
   function backToBox() {
     if (hits.length) {
       // update our result, and tell box to re-render the current hitIndex
       const hit = hits[hitIndex]
       searchInput.setContent(`${hitIndex + 1} of ${hits.length} found: ${hit.path}`)
-      box.data.searchHit = { hit, highlight: queryRegex }
+      box.data.searchHit = { hit, highlight: str2regex(query) }
     }
     else {
       // put the cursor back
@@ -84,8 +83,9 @@ function setup(options = {}) {
     else {
       // fresh search
       query = searchInput.content
-      find()
-      if (hits.length) {
+      const possible = find(source, query)
+      if (possible.length) {
+        hits = possible
         hitIndex = 0
         backToBox()
       }
@@ -121,45 +121,48 @@ function setup(options = {}) {
   searchPrompt.hide()
   searchInput.hide()
 
-  function find() {
-    query = searchInput.content
-    if (/^\s*$/.test(query)) {
-      return []
-    }
+}
 
-    const m = query.match(/^\/(.*)\/([gimuy]*)$/)
-    if (m) {
-      queryRegex = new RegExp(m[1], m[2])
-    }
-    else {
-      // https://stackoverflow.com/a/3561711/2926055
-      queryRegex = new RegExp(query.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'))
-    }
+function str2regex(s) {
+  const m = s.match(/^\/(.*)\/([gimuy]*)$/)
+  return m
+   ? RegExp(m[1], m[2])
+   : RegExp(s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')) // https://stackoverflow.com/a/3561711/2926055
+}
 
-    walk(source, function(path, v, paths) {
-      if (typeof v === 'object' && v.constructor === Object) {
-        // walk already passes us `path` for:
-        //   - scalars
-        //   - array elements
-        //   - object VALUES
-        // ...but not object KEYS, which we have to check ourselves
-        for (let [key, value] of Object.entries(v)) {
-          if (queryRegex.test(key)) {
-            path += '.' + key
-            const route = paths.slice()
-            route.push(path)
-            hits.push({ path, route })
-          }
+function find(source, query) {
+  if (/^\s*$/.test(query)) {
+    return []
+  }
+
+  const regex = str2regex(query)
+  const hits = []
+
+  walk(source, function(path, v, paths) {
+    if (typeof v === 'object' && v.constructor === Object) {
+      // walk already passes us `path` for:
+      //   - scalars
+      //   - array elements
+      //   - object VALUES
+      // ...but not object KEYS, which we have to check ourselves
+      for (let [key, value] of Object.entries(v)) {
+        if (regex.test(key)) {
+          path += '.' + key
+          const route = paths.slice()
+          route.push(path)
+          hits.push({ path, route })
         }
       }
-      else if (typeof v === 'string' && queryRegex.test(v)) {
-        hits.push({
-          path: path,
-          route: paths.slice(),
-        })
-      }
-    })
-  }
+    }
+    else if (typeof v === 'string' && regex.test(v)) {
+      hits.push({
+        path: path,
+        route: paths.slice(),
+      })
+    }
+  })
+
+  return hits
 }
 
 module.exports = setup
