@@ -146,6 +146,10 @@ module.exports = function start(filename, source) {
     }
   })
 
+  input.key('C-c', function () {
+    input.emit('cancel')
+  })
+
   input.key('C-u', function () {
     input.setValue('')
     update('')
