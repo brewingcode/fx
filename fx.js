@@ -419,37 +419,12 @@ module.exports = function start(filename, source) {
     box.setContent(content)
 
     if (path) {
-      // todo: make this more accurate: because of the difference in line/row
-      // indexing between `content` and `box.getScreenLines()`, we cannot
-      // exactly address the lines in `index`. So, we have to rely on the
-      // imperfect method of relying on the printed-and-indented json lines
-      // being unique enough that we can rely on this search method. The worst
-      // that happens is the cursor does not land on the right line when
-      // cycling through search results, so it's not the worst hack ever.
-      const lines = box.getLines()
-      const screenLines = box.getScreenLines()
-      const match = [...index].find(pair => pair[1] === path)
-      let screenLine
-      if (match) {
-        const showLine = screenLine = match[0]
-        while(lines.length !== screenLines.length && screenLine < screenLines.length) {
-          if (lines[showLine] === screenLines[screenLine]) {
-            break;
-          }
-          if (lines[showLine].startsWith(screenLines[screenLine])) {
-            break;
-          }
-          screenLine++
-        }
-      }
-      else {
-        // some internal error, just go to first line
-        screenLine = 1
-      }
-
-      box.scrollTo(screenLine - 1)
-      const line = screenLines[screenLine]
-      program.cursorPos(screenLine - box.childBase, line ? line.search(/\S/) : 0)
+      const m = [...index].find(pair => pair[1] === path)
+      let y = box.getScreenNumber(m[0])
+      if (--y < 0) y = 0
+      const line = box.getLine(m[0])
+      box.scrollTo(y)
+      program.cursorPos(y - box.childBase + 1, line ? line.search(/\S/) : 0)
     }
 
     screen.render()
