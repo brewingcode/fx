@@ -206,10 +206,10 @@ module.exports = function start(filename, source) {
       const { path } = box.data.searchHit.hit
       box.height = '100%-1'
       box.emit('hidesearch')
-      expanded.clear()
-      expanded.add(path)
+      bar.show()
       input.setValue(path)
       apply()
+      input.readInput()
     }
   })
 
