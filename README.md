@@ -4,8 +4,8 @@
 _* Function eXecution_
 
 [![Build Status](https://travis-ci.org/antonmedv/fx.svg?branch=master)](https://travis-ci.org/antonmedv/fx)
-[![Npm Version](https://badgen.net/npm/v/fx)](https://www.npmjs.com/package/fx)
-[![Brew Version](https://badgen.net/homebrew/v/fx)](https://formulae.brew.sh/formula/fx)
+[![Npm Version](https://img.shields.io/npm/v/fx.svg)](https://www.npmjs.com/package/fx)
+[![Brew Version](https://img.shields.io/homebrew/v/fx.svg)](https://formulae.brew.sh/formula/fx)
 
 Command-line JSON processing tool
 
@@ -62,7 +62,7 @@ $ curl ... | fx 'json => json.message' 'json => json.filter(x => x.startsWith("a
 
 Access all lodash (or ramda, etc) methods by using [.fxrc](https://github.com/antonmedv/fx/blob/master/docs.md#using-fxrc) file.
 ```bash
-$ curl ... | fx '_.mapValues(_.groupBy(this, "commit.committer.name"), _.size)'
+$ curl ... | fx '_.groupBy("commit.committer.name")' '_.mapValues(_.size)'
 ```
 
 Update JSON using spread operator.

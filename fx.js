@@ -3,18 +3,25 @@ const fs = require('fs')
 const tty = require('tty')
 const blessed = require('@medv/blessed')
 const stringWidth = require('string-width')
-const reduce = require('./reduce')
+const { walk, reduce } = require('./helpers')
 const print = require('./print')
+const search = require('./search')
 const config = require('./config')
 
 module.exports = function start(filename, source) {
+  // Current rendered object on a screen.
   let json = source
+
+  // Contains map from row number to expand path.
+  // Example: {0: '', 1: '.foo', 2: '.foo[0]'}
   let index = new Map()
+
+  // Contains expanded paths. Example: ['', '.foo']
+  // Empty string represents root path.
   const expanded = new Set()
-  expanded.add('') // Root of JSON
+  expanded.add('')
 
   const ttyFd = fs.openSync('/dev/tty', 'r+')
-
   const program = blessed.program({
     input: tty.ReadStream(ttyFd),
     output: tty.WriteStream(ttyFd),
@@ -58,10 +65,22 @@ module.exports = function start(filename, source) {
     style: config.list,
   })
 
+  box.on('focus', function () {
+    if (box.data.searchHit) {
+      const { hit, highlight } = box.data.searchHit
+      box.data.searchHit = null
+      expanded.clear()
+      expanded.add('')
+      hit.route.forEach(h => expanded.add(h))
+      render({path:hit.path, highlight})
+    }
+  })
+
   screen.title = filename
   box.focus()
   input.hide()
   autocomplete.hide()
+  search({blessed, program, screen, box, source})
 
   screen.key(['escape', 'q', 'C-c'], function () {
     program.disableMouse()                // If exit program immediately, stdin may still receive
@@ -79,7 +98,7 @@ module.exports = function start(filename, source) {
       // Autocomplete selected
       let code = input.getValue()
       let replace = autocomplete.getSelected()
-      if (/^[a-z]\w+$/.test(replace)) {
+      if (/^[a-z]\w*$/i.test(replace)) {
         replace = '.' + replace
       } else {
         replace = `["${replace}"]`
@@ -143,6 +162,7 @@ module.exports = function start(filename, source) {
 
   box.key('.', function () {
     box.height = '100%-1'
+    box.emit('hidesearch')
     input.show()
     if (input.getValue() === '') {
       input.setValue('.')
@@ -162,13 +182,33 @@ module.exports = function start(filename, source) {
     expanded.clear()
     expanded.add('')
     render()
+
+    // Make sure cursor stay on JSON object.
+    const [n] = getLine(program.y)
+    if (typeof n === 'undefined' || !index.has(n)) {
+      // No line under cursor
+      let rest = [...index.keys()]
+      if (rest.length > 0) {
+        const next = Math.max(...rest)
+        let y = box.getScreenNumber(next) - box.childBase
+        if (y <= 0) {
+          y = 0
+        }
+        const line = box.getScreenLine(y + box.childBase)
+        program.cursorPos(y, line.search(/\S/))
+      }
+    }
   })
 
   box.key(['up', 'k'], function () {
     program.showCursor()
+    let rest = [...index.keys()]
 
     const [n] = getLine(program.y)
-    const rest = [...index.keys()].filter(i => i < n)
+    if (typeof n !== 'undefined') {
+      rest = rest.filter(i => i < n)
+    }
+
     if (rest.length > 0) {
       const next = Math.max(...rest)
 
@@ -186,9 +226,13 @@ module.exports = function start(filename, source) {
 
   box.key(['down', 'j'], function () {
     program.showCursor()
+    let rest = [...index.keys()]
 
     const [n] = getLine(program.y)
-    const rest = [...index.keys()].filter(i => i > n)
+    if (typeof n !== 'undefined') {
+      rest = rest.filter(i => i > n)
+    }
+
     if (rest.length > 0) {
       const next = Math.min(...rest)
 
@@ -249,6 +293,9 @@ module.exports = function start(filename, source) {
     const dy = box.childBase + y
     const n = box.getNumber(dy)
     const line = box.getScreenLine(dy)
+    if (typeof line === 'undefined') {
+      return [n, '']
+    }
     return [n, line]
   }
 
@@ -266,6 +313,7 @@ module.exports = function start(filename, source) {
       input.hide()
       json = source
     }
+    box.emit('updatesearchsource', json)
     box.focus()
     program.cursorPos(0, 0)
     render()
@@ -278,6 +326,7 @@ module.exports = function start(filename, source) {
     let json
     try {
       json = reduce(source, code)
+      // NOTE: do not emit "updatesearchsource", this `json` is LOCAL scope
     } catch (e) {
     }
 
@@ -329,42 +378,60 @@ module.exports = function start(filename, source) {
     if (code === '') {
       json = source
     }
+    box.emit('updatesearchsource', json)
     render()
   }
 
-  function render() {
+  // `searchInfo` is passed to us via:
+  //   - searchInput.on("submit")
+  //   - box.on("focus")
+  function render(searchInfo = '') {
+    const { path, highlight } = searchInfo
     let content
-    [content, index] = print(json, {expanded})
+    [content, index] = print(json, {expanded, currentPath:path, highlight})
 
     if (typeof content === 'undefined') {
       content = 'undefined'
     }
 
     box.setContent(content)
+
+    if (path) {
+      // todo: make this more accurate: because of the difference in line/row
+      // indexing between `content` and `box.getScreenLines()`, we cannot
+      // exactly address the lines in `index`. So, we have to rely on the
+      // imperfect method of relying on the printed-and-indented json lines
+      // being unique enough that we can rely on this search method. The worst
+      // that happens is the cursor does not land on the right line when
+      // cycling through search results, so it's not the worst hack ever.
+      const lines = box.getLines()
+      const screenLines = box.getScreenLines()
+      const match = [...index].find(pair => pair[1] === path)
+      let screenLine
+      if (match) {
+        const showLine = screenLine = match[0]
+        while(lines.length !== screenLines.length && screenLine < screenLines.length) {
+          if (lines[showLine] === screenLines[screenLine]) {
+            break;
+          }
+          if (lines[showLine].startsWith(screenLines[screenLine])) {
+            break;
+          }
+          screenLine++
+        }
+      }
+      else {
+        // some internal error, just go to first line
+        screenLine = 1
+      }
+
+      box.scrollTo(screenLine - 1)
+      const line = screenLines[screenLine]
+      program.cursorPos(screenLine - box.childBase, line ? line.search(/\S/) : 0)
+    }
+
     screen.render()
   }
 
   render()
-}
-
-function walk(v, cb, path = '') {
-  if (!v) {
-    return
-  }
-
-  if (Array.isArray(v)) {
-    cb(path)
-    let i = 0
-    for (let item of v) {
-      walk(item, cb, path + '[' + (i++) + ']')
-    }
-  }
-
-  if (typeof v === 'object' && v.constructor === Object) {
-    cb(path)
-    let i = 0
-    for (let [key, value] of Object.entries(v)) {
-      walk(value, cb, path + '.' + key)
-    }
-  }
 }

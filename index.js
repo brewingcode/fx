@@ -3,7 +3,9 @@
 const os = require('os')
 const fs = require('fs')
 const path = require('path')
+const minimist = require('minimist')
 const {stdin, stdout, stderr} = process
+
 try {
   require(path.join(os.homedir(), '.fxrc'))
 } catch (err) {
@@ -12,7 +14,7 @@ try {
   }
 }
 const print = require('./print')
-const reduce = require('./reduce')
+const {reduce} = require('./helpers')
 
 const usage = `
   Usage
@@ -21,9 +23,9 @@ const usage = `
   Examples
     $ echo '{"key": "value"}' | fx 'x => x.key'
     value
-    
+
     $ echo '{"key": "value"}' | fx .key
-    value    
+    value
 
     $ echo '[1,2,3]' | fx 'this.map(x => x * 2)'
     [2, 4, 6]
@@ -33,35 +35,39 @@ const usage = `
 
     $ echo '{"count": 0}' | fx '{...this, count: 1}'
     {"count": 1}
-    
+
     $ echo '{"foo": 1, "bar": 2}' | fx ?
     ["foo", "bar"]
-  
 `
 
 function main(input) {
-  let args = process.argv.slice(2)
+  let args = minimist(process.argv.slice(2))
   let filename = 'fx'
+  let exprs = []
 
   if (input === '') {
-    if (args.length === 0) {
+    if (args._.length === 0) {
       stderr.write(usage)
       process.exit(2)
     }
 
-    input = fs.readFileSync(args[0])
-    filename = path.basename(args[0])
-    args = args.slice(1)
+    [ filename, ...exprs ] = args._
+    input = fs.readFileSync(filename)
+    filename = path.basename(filename)
+  }
+  else {
+    exprs = args._
   }
 
   const json = JSON.parse(input)
 
-  if (args.length === 0 && stdout.isTTY) {
+  if (exprs.length === 0 && stdout.isTTY) {
+    // interactive mode
     require('./fx')(filename, json)
     return
   }
 
-  const output = args.reduce(reduce, json)
+  const output = exprs.reduce(reduce, json)
 
   if (typeof output === 'undefined') {
     stderr.write('undefined\n')
