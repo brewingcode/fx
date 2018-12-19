@@ -16,7 +16,7 @@ function format(value, style, highlightStyle, regexp, transform = x => x) {
 }
 
 function print(input, options = {}) {
-  const {expanded, highlight, currentPath} = options
+  const {expanded, highlight, currentPath, noFormat} = options
   const index = new Map()
   let row = 0
 
@@ -26,10 +26,19 @@ function print(input, options = {}) {
     // Code for highlighting parts become cumbersome.
     // Maybe we should refactor this part.
     const highlightStyle = (currentPath === path) ? config.highlightCurrent : config.highlight
-    const formatStyle = (v, style) => format(JSON.stringify(v), style, highlightStyle, highlight)
+    const formatStyle = (v, style) => {
+      return noFormat
+        ? JSON.stringify(v)
+        : format(JSON.stringify(v), style, highlightStyle, highlight)
+    }
     const formatText = (v, style, path) => {
-      const highlightStyle = (currentPath === path) ? config.highlightCurrent : config.highlight
-      return format(v, style, highlightStyle, highlight, JSON.stringify)
+      if (noFormat) {
+        return JSON.stringify(v)
+      }
+      else {
+        const highlightStyle = (currentPath === path) ? config.highlightCurrent : config.highlight
+        return format(v, style, highlightStyle, highlight, JSON.stringify)
+      }
     }
 
     const eol = () => {
