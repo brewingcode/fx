@@ -5,6 +5,7 @@ const fs = require('fs')
 const path = require('path')
 const minimist = require('minimist')
 const {stdin, stdout, stderr} = process
+const search = require('./search')
 
 try {
   require(path.join(os.homedir(), '.fxrc'))
@@ -61,14 +62,24 @@ function main(input) {
 
   const json = JSON.parse(input)
 
+  const query = args.query || args.f
+  if (query) {
+    // output paths to search hits
+    const hits = search.find(json, query)
+    hits.forEach(function(h) {
+      console.log(h.path)
+    })
+    return
+  }
+
   if (exprs.length === 0 && stdout.isTTY) {
     // interactive mode
     require('./fx')(filename, json)
     return
   }
 
+  // reduce the json by running each expression against it
   const output = exprs.reduce(reduce, json)
-
   if (typeof output === 'undefined') {
     stderr.write('undefined\n')
   } else if (typeof output === 'string') {

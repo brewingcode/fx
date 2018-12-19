@@ -162,4 +162,4 @@ function find(source, query) {
   return hits
 }
 
-module.exports = setup
+module.exports = { setup, find }
