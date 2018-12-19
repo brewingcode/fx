@@ -82,10 +82,15 @@ function setup(options = {}) {
     else {
       // fresh search
       query = searchInput.content
-      hits = find(source, query)
-      hitIndex = 0
-      if (hits.length === 0) {
-        searchInput.setContent('no hits found')
+      if (query) {
+        hits = find(source, query)
+        hitIndex = 0
+        if (hits.length === 0) {
+          searchInput.setContent('no hits found')
+        }
+      }
+      else {
+        hide()
       }
       backToBox()
     }
