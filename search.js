@@ -39,6 +39,7 @@ function setup(options = {}) {
       // put the cursor back
       const line = box.getScreenLine(box.childBase + boxLine)
       program.cursorPos(boxLine, line ? line.search(/\S/) : 0)
+      box.data.searchHit = { hit: null, highlight: null }
     }
     program.showCursor()
     screen.render()
@@ -83,16 +84,12 @@ function setup(options = {}) {
     else {
       // fresh search
       query = searchInput.content
-      const possible = find(source, query)
-      if (possible.length) {
-        hits = possible
-        hitIndex = 0
-        backToBox()
-      }
-      else {
+      hits = find(source, query)
+      hitIndex = 0
+      if (hits.length === 0) {
         searchInput.setContent('no hits found')
-        backToBox()
       }
+      backToBox()
     }
   })
 

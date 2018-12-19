@@ -68,11 +68,15 @@ module.exports = function start(filename, source) {
   box.on('focus', function () {
     if (box.data.searchHit) {
       const { hit, highlight } = box.data.searchHit
-      box.data.searchHit = null
-      expanded.clear()
-      expanded.add('')
-      hit.route.forEach(h => expanded.add(h))
-      render({path:hit.path, highlight})
+      if (hit) {
+        expanded.clear()
+        expanded.add('')
+        hit.route.forEach(h => expanded.add(h))
+        render({path:hit.path, highlight})
+      }
+      else {
+        render()
+      }
     }
   })
 
