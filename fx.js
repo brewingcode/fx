@@ -173,6 +173,8 @@ module.exports = function start(filename, source) {
 
   input.key('C-u', function () {
     input.setValue('')
+    autocomplete.hide()
+    screen.render()
     update('')
     render()
   })
@@ -181,6 +183,8 @@ module.exports = function start(filename, source) {
     let code = input.getValue()
     code = code.replace(/[\.\[][^\.\[]*$/, '')
     input.setValue(code)
+    autocomplete.hide()
+    screen.render()
     update(code)
     render()
   })
