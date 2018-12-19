@@ -158,26 +158,27 @@ Click on fields to expand or collapse JSON tree, use mouse wheel to scroll view.
 
 Next commands available in interactive mode:
 
-|             Key               |         Command         |
-|-------------------------------|-------------------------|
-| `q` or `Esc` or `Ctrl`+`c`    | Exit                    |
-| `e`/`E`                       | Expand/Collapse all     |
-| `g`/`G`                       | Goto top/bottom         |
-| `up`/`down` or `k/j`          | Move cursor up/down     |
-| `left`/`right` or `h/l`       | Expand/Collapse         |
-| `.`                           | Edit filter             |
-| `/`                           | Search                  |
-| `n`/`p`                       | Next/previous result    |
+|             Key               |         Command            |
+|-------------------------------|----------------------------|
+| `q` or `Esc` or `Ctrl`+`c`    | Exit                       |
+| `e`/`E`                       | Expand/Collapse all        |
+| `g`/`G`                       | Goto top/bottom            |
+| `up`/`down` or `k/j`          | Move cursor up/down        |
+| `left`/`right` or `h/l`       | Expand/Collapse            |
+| `.`                           | Edit filter                |
+| `/`                           | Search                     |
+| `n`/`p`                       | Next/previous result       |
+| `f`                           | Transfer search to filter  |
+| `w`                           | Write json to file         |
 
-These commands are available when editing the filter, or when inputting a
-search query:
+These commands are available when entering text:
 
-|     Key      |        Command          | Filter/Search |
-|--------------|-------------------------|---------------|
-| `Enter`      | Apply filter/Do search  | Both          |
-| `Ctrl`+`u`   | Clear filter/query      | Both          |
-| `Ctrl`+`w`   | Delete last part        | Filter only   |
-| `up`/`down`  | Select autocomplete     | Filter only   |
+|     Key      |        Command          |         Action         |
+|--------------|-------------------------|------------------------|
+| `Enter`      | Run action with input   | Filter, Search, Output |
+| `Ctrl`+`u`   | Clear input             | Filter, Search, Output |
+| `Ctrl`+`w`   | Delete last part        | Filter                 |
+| `up`/`down`  | Select autocomplete     | Filter                 |
 
 The search query can either be plaintext, or if the query looks like a regex
 (quoted with slashes, with optional regex flags after the trailing slash), it
@@ -186,6 +187,10 @@ will be used as a regex. The search is made against:
 - strings
 - array elements
 - hash keys and values
+
+Note that the file written by the "w" action may not be valid JSON, because it
+looks exactly like what you see on screen; it might contains ellipses (`…`) to
+represent unexpanded branches.
 
 ### Selecting text
 
