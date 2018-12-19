@@ -30,9 +30,10 @@ function walk(v, cb, path = '', paths = []) {
 }
 
 function reduce(json, code) {
-  if (/^\.?\[/.test(code)) {
+  const m = code ? code.match(/^\.?(\[.*)/) : null
+  if (m) {
     const fx = eval(`function fn() {
-      return ${'this' + code.substring(1)}
+      return ${'this' + m[1]}
     }; fn`)
     return fx.call(json)
   }
