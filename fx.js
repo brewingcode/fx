@@ -144,9 +144,7 @@ module.exports = function start(filename, source) {
       // Autocomplete not selected
       autocomplete.hide()
       screen.render()
-
-      // Keep editing code
-      input.readInput()
+      box.focus()
     }
   })
 
