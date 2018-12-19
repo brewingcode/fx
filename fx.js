@@ -97,7 +97,8 @@ module.exports = function start(filename, source) {
 
   input.on('submit', function () {
     if (autocomplete.hidden) {
-      apply()
+      const code = input.getValue()
+      apply(code)
     } else {
       // Autocomplete selected
       let code = input.getValue()
@@ -120,7 +121,8 @@ module.exports = function start(filename, source) {
 
   input.on('cancel', function () {
     if (autocomplete.hidden) {
-      apply()
+      const code = input.getValue()
+      apply(code)
     } else {
       // Autocomplete not selected
       autocomplete.hide()
@@ -177,7 +179,7 @@ module.exports = function start(filename, source) {
       complete('.')
     }
     input.readInput()
-    render()
+    screen.render()
   })
 
   box.key('f', function () {
@@ -390,7 +392,11 @@ module.exports = function start(filename, source) {
       code = code.replace(/^\[/, '.[')
       try {
         const pretender = reduce(source, code)
-        if (typeof pretender !== 'undefined' && typeof pretender !== 'function') {
+        if (
+          typeof pretender !== 'undefined'
+          && typeof pretender !== 'function'
+          && !(pretender instanceof RegExp)
+        ) {
           json = pretender
         }
       } catch (e) {
