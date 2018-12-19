@@ -6,6 +6,7 @@ const stringWidth = require('string-width')
 const { walk, reduce } = require('./helpers')
 const print = require('./print')
 const search = require('./search')
+const write = require('./write')
 const config = require('./config')
 
 module.exports = function start(filename, source) {
@@ -56,6 +57,8 @@ module.exports = function start(filename, source) {
     width: '100%',
   })
 
+  box.vars = function() { return { expanded, json } }
+
   const prompt = blessed.text({
     parent: bar,
     bottom: 0,
@@ -102,6 +105,8 @@ module.exports = function start(filename, source) {
   bar.hide()
   autocomplete.hide()
   search.setup({blessed, program, screen, box, source})
+
+  write({screen, box, bar, prompt})
 
   screen.key(['escape', 'q', 'C-c'], function () {
     program.disableMouse()                // If exit program immediately, stdin may still receive
@@ -344,6 +349,7 @@ module.exports = function start(filename, source) {
     return [n, line]
   }
 
+  box.on('apply', apply)
   function apply() {
     let code = input.getValue()
 

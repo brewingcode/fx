@@ -14,7 +14,8 @@
     "index.js",
     "print.js",
     "helpers.js",
-    "search.js"
+    "search.js",
+    "write.js"
   ],
   "scripts": {
     "test": "ava",
