@@ -48,10 +48,27 @@ module.exports = function start(filename, source) {
     scrollable: true,
   })
 
-  const input = blessed.textbox({
+  const bar = blessed.box({
     parent: screen,
     bottom: 0,
     left: 0,
+    height: 1,
+    width: '100%',
+  })
+
+  const prompt = blessed.text({
+    parent: bar,
+    bottom: 0,
+    left: 0,
+    height: 1,
+    width: 8,
+    content: 'filter:',
+  })
+
+  const input = blessed.textbox({
+    parent: bar,
+    bottom: 0,
+    left: 8,
     height: 1,
     width: '100%',
   })
@@ -82,7 +99,7 @@ module.exports = function start(filename, source) {
 
   screen.title = filename
   box.focus()
-  input.hide()
+  bar.hide()
   autocomplete.hide()
   search.setup({blessed, program, screen, box, source})
 
@@ -173,7 +190,7 @@ module.exports = function start(filename, source) {
   box.key('.', function () {
     box.height = '100%-1'
     box.emit('hidesearch')
-    input.show()
+    bar.show()
     if (input.getValue() === '') {
       input.setValue('.')
       complete('.')
@@ -337,7 +354,7 @@ module.exports = function start(filename, source) {
       }
     } else {
       box.height = '100%'
-      input.hide()
+      bar.hide()
       json = source
     }
     box.emit('updatesearchsource', json)

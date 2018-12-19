@@ -115,7 +115,6 @@ function setup(options = {}) {
 
   searchPrompt.hide()
   searchInput.hide()
-
 }
 
 function str2regex(s) {
