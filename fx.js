@@ -180,6 +180,18 @@ module.exports = function start(filename, source) {
     render()
   })
 
+  box.key('f', function () {
+    if (box.data.searchHit) {
+      const { path } = box.data.searchHit.hit
+      box.height = '100%-1'
+      box.emit('hidesearch')
+      expanded.clear()
+      expanded.add(path)
+      input.setValue(path)
+      apply()
+    }
+  })
+
   box.key('e', function () {
     expanded.clear()
     walk(json, path => expanded.size < 1000 && expanded.add(path))
