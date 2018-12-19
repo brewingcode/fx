@@ -95,7 +95,7 @@ function setup(options = {}) {
     box.height = '100%'
     searchPrompt.hide()
     searchInput.hide()
-    backToBox()
+    screen.render()
   }
   searchInput.on('cancel', hide)
   box.on('hidesearch', hide)

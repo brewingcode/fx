@@ -299,13 +299,17 @@ module.exports = function start(filename, source) {
     program.hideCursor()
     program.cursorPos(mouse.y, line.search(/\S/))
     autocomplete.hide()
-
     const path = index.get(n)
     if (expanded.has(path)) {
       expanded.delete(path)
     } else {
       expanded.add(path)
     }
+
+    box.data.searchHit = null
+    box.emit('hidesearch')
+    box.emit('updatesearchsource', json)
+
     render()
   })
 
@@ -420,11 +424,13 @@ module.exports = function start(filename, source) {
 
     if (path) {
       const m = [...index].find(pair => pair[1] === path)
-      let y = box.getScreenNumber(m[0])
-      if (--y < 0) y = 0
-      const line = box.getLine(m[0])
-      box.scrollTo(y)
-      program.cursorPos(y - box.childBase + 1, line ? line.search(/\S/) : 0)
+      if (m) {
+        let y = box.getScreenNumber(m[0])
+        if (--y < 0) y = 0
+        const line = box.getLine(m[0])
+        box.scrollTo(y)
+        program.cursorPos(y - box.childBase + 1, line ? line.search(/\S/) : 0)
+      }
     }
 
     screen.render()
