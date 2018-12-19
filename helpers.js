@@ -30,6 +30,13 @@ function walk(v, cb, path = '', paths = []) {
 }
 
 function reduce(json, code) {
+  if (/^\.?\[/.test(code)) {
+    const fx = eval(`function fn() {
+      return ${'this' + code.substring(1)}
+    }; fn`)
+    return fx.call(json)
+  }
+
   if (/^\./.test(code)) {
     const fx = eval(`function fn() { 
       return ${code === '.' ? 'this' : 'this' + code} 

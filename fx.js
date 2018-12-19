@@ -320,9 +320,10 @@ module.exports = function start(filename, source) {
   }
 
   function apply() {
-    const code = input.getValue()
+    let code = input.getValue()
 
     if (code && code.length !== 0) {
+      code = code.replace(/^\[/, '.[')
       try {
         json = reduce(source, code)
       } catch (e) {
@@ -386,6 +387,7 @@ module.exports = function start(filename, source) {
 
   function update(code) {
     if (code && code.length !== 0) {
+      code = code.replace(/^\[/, '.[')
       try {
         const pretender = reduce(source, code)
         if (typeof pretender !== 'undefined' && typeof pretender !== 'function') {
