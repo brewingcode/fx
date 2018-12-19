@@ -59,19 +59,17 @@ function setup(options = {}) {
   })
 
   box.key('n', function () {
-    if (hitIndex + 1 > hits.length - 1) {
-      return
+    if (hitIndex + 1 <= hits.length - 1) {
+      hitIndex++
     }
-    hitIndex++
     backToBox()
   })
 
   box.key('p', function () {
     // todo: "N" would be prefereable, but `box.key('N', ...)` does not hook into "N" keypresses
-    if (hitIndex - 1 < 0) {
-      return
+    if (hitIndex - 1 >= 0) {
+      hitIndex--
     }
-    hitIndex--
     backToBox()
   })
 
