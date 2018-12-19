@@ -68,11 +68,15 @@ module.exports = function start(filename, source) {
   box.on('focus', function () {
     if (box.data.searchHit) {
       const { hit, highlight } = box.data.searchHit
-      box.data.searchHit = null
-      expanded.clear()
-      expanded.add('')
-      hit.route.forEach(h => expanded.add(h))
-      render({path:hit.path, highlight})
+      if (hit) {
+        expanded.clear()
+        expanded.add('')
+        hit.route.forEach(h => expanded.add(h))
+        render({path:hit.path, highlight})
+      }
+      else {
+        render()
+      }
     }
   })
 
@@ -146,6 +150,10 @@ module.exports = function start(filename, source) {
     }
   })
 
+  input.key('C-c', function () {
+    input.emit('cancel')
+  })
+
   input.key('C-u', function () {
     input.setValue('')
     update('')
@@ -170,6 +178,18 @@ module.exports = function start(filename, source) {
     }
     input.readInput()
     render()
+  })
+
+  box.key('f', function () {
+    if (box.data.searchHit) {
+      const { path } = box.data.searchHit.hit
+      box.height = '100%-1'
+      box.emit('hidesearch')
+      expanded.clear()
+      expanded.add(path)
+      input.setValue(path)
+      apply()
+    }
   })
 
   box.key('e', function () {

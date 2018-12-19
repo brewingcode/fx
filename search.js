@@ -30,15 +30,16 @@ function setup(options = {}) {
 
   function backToBox() {
     if (hits.length) {
-      // update our result, and tell box to re-render the current hitIndex
+      // render to the line of our current hit
       const hit = hits[hitIndex]
       searchInput.setContent(`${hitIndex + 1} of ${hits.length} found: ${hit.path}`)
       box.data.searchHit = { hit, highlight: str2regex(query) }
     }
     else {
-      // put the cursor back
+      // render a clean view
       const line = box.getScreenLine(box.childBase + boxLine)
       program.cursorPos(boxLine, line ? line.search(/\S/) : 0)
+      box.data.searchHit = { hit: null, highlight: null }
     }
     program.showCursor()
     screen.render()
@@ -83,16 +84,12 @@ function setup(options = {}) {
     else {
       // fresh search
       query = searchInput.content
-      const possible = find(source, query)
-      if (possible.length) {
-        hits = possible
-        hitIndex = 0
-        backToBox()
-      }
-      else {
+      hits = find(source, query)
+      hitIndex = 0
+      if (hits.length === 0) {
         searchInput.setContent('no hits found')
-        backToBox()
       }
+      backToBox()
     }
   })
 
