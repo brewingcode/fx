@@ -19,7 +19,7 @@ function walk(v, cb, path = '', paths = []) {
   else if (typeof v === 'object' && v.constructor === Object) {
     cb(path, v, paths)
     for (let [key, value] of Object.entries(v)) {
-      walk(value, cb, path + '.' + key, paths)
+      walk(value, cb, appendPath(path, key), paths)
     }
   }
   else {
@@ -39,6 +39,7 @@ function reduce(json, code) {
   }
 
   if (/^\./.test(code)) {
+    code = appendPath('', code)
     const fx = eval(`function fn() { 
       return ${code === '.' ? 'this' : 'this' + code} 
     }; fn`)
