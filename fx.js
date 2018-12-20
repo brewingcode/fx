@@ -3,7 +3,7 @@ const fs = require('fs')
 const tty = require('tty')
 const blessed = require('@medv/blessed')
 const stringWidth = require('string-width')
-const { walk, reduce } = require('./helpers')
+const { walk, reduce, popPath } = require('./helpers')
 const print = require('./print')
 const search = require('./search')
 const write = require('./write')
@@ -343,10 +343,6 @@ module.exports = function start(filename, source) {
     render()
   })
 
-  // pop() the last bit off the path
-  function popPath(path) {
-    return path ? path.replace(/[\.\[][^\.\[]*$/, '') : '.'
-  }
 
   function getLine(y) {
     const dy = box.childBase + y

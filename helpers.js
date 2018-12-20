@@ -66,4 +66,9 @@ function reduce(json, code) {
   return fn
 }
 
-module.exports = { walk, reduce }
+// pop() the last bit off the path
+function popPath(path) {
+  return path ? path.replace(/[\.\[][^\.\[]*$/, '') : '.'
+}
+
+module.exports = { walk, reduce, popPath }
