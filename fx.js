@@ -142,15 +142,13 @@ module.exports = function start(filename, source) {
   })
 
   input.on('cancel', function () {
-    if (autocomplete.hidden) {
-      const code = input.getValue()
-      apply(code)
-    } else {
+    if (!autocomplete.hidden) {
       // Autocomplete not selected
       autocomplete.hide()
-      screen.render()
-      box.focus()
     }
+    bar.hide()
+    box.focus()
+    screen.render()
   })
 
   input.on('update', function (code) {
