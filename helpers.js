@@ -45,10 +45,6 @@ function reduce(json, code) {
     return fx.call(json)
   }
 
-  if ('?' === code) {
-    return Object.keys(json)
-  }
-
   if (/yield\*?\s/.test(code)) {
     const fx = eval(`function fn() {
       const gen = (function*(){ 
