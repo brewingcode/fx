@@ -13,17 +13,17 @@ test('pass', t => {
 
 test('anon func', t => {
   const r = fx({"key": "value"}, "'function (x) { return x.key }'")
-  t.deepEqual(r, 'value\n')
+  t.is(r, 'value\n')
 })
 
 test('arrow func', t => {
   const r = fx({"key": "value"}, "'x => x.key'")
-  t.deepEqual(r, 'value\n')
+  t.is(r, 'value\n')
 })
 
 test('arrow func ()', t => {
   const r = fx({"key": "value"}, "'(x) => x.key'")
-  t.deepEqual(r, 'value\n')
+  t.is(r, 'value\n')
 })
 
 test('this bind', t => {
@@ -38,7 +38,7 @@ test('generator', t => {
 
 test('chain', t => {
   const r = fx({"items": ["foo", "bar"]}, "'this.items' 'yield* this' 'x => x[1]'")
-  t.deepEqual(r, 'bar\n')
+  t.is(r, 'bar\n')
 })
 
 test('search', t => {
@@ -52,8 +52,8 @@ test('search', t => {
     }
   ]
   let r = fx(json, '--find bar')
-  t.deepEqual(r, '[1]\n')
+  t.is(r, '[1]\n')
 
   r = fx(json, '--find /bar/i')
-  t.deepEqual(r, '[1]\n[2].this.that[2]\n')
+  t.is(r, '[1]\n.[2].this.that[2]\n')
 })
