@@ -16,6 +16,7 @@ This is a fork of [antonmedv/fx](https://github.com/antonmedv/fx) that differs i
 - consistency in the bottom bar between filtering, finding, and writing to a file
 - fix array handling at the top level of input
 - fix initial `.[` and `[` in filter
+- implement counts instead of ellipses (`{ 22 }` vs `{…}` and `[ 3 ]` vs `[…]`)
 
 ## License
 
