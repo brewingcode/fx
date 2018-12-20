@@ -39,7 +39,6 @@ function reduce(json, code) {
   }
 
   if (/^\./.test(code)) {
-    code = appendPath('', code)
     const fx = eval(`function fn() { 
       return ${code === '.' ? 'this' : 'this' + code} 
     }; fn`)
@@ -69,17 +68,21 @@ function reduce(json, code) {
 
 // pop() the last bit off the path
 function popPath(path) {
-  return path ? path.replace(/[\.\[][^\.\[]*$/, '') : '.'
+  path = path ? path.replace(/[\.\[][^\.\[]*$/, '') : '.'
+  return path === '' ? '.' : path
 }
 
 // append() to a path
 function appendPath(path, next) {
-  if (/^[a-z]\w*$/i.test(next)) {
-    next = '.' + next
-  } else {
-    next = `["${next}"]`
+  if (/^(\.|this)$/.test(path)) {
+    path = ''
   }
-  return path.replace(/\.\w*$/, next)
+  if (/\s/.test(next)) {
+    return path + `["${next}"]`
+  }
+  else {
+    return path + '.' + next
+  }
 }
 
 module.exports = { walk, reduce, popPath, appendPath }

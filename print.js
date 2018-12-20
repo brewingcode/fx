@@ -1,6 +1,7 @@
 'use strict'
 const indent = require('indent-string')
 const config = require('./config')
+const { appendPath } = require('./helpers')
 
 function format(value, style, highlightStyle, regexp, transform = x => x) {
   if (!regexp) {
@@ -102,7 +103,8 @@ function print(input, options = {}) {
           output += eol()
           let i = 0
           for (let [key, value] of entries) {
-            const part = formatText(key, config.key, path + '.' + key) + config.colon(':') + ' ' + doPrint(value, path + '.' + key)
+            const newPath = appendPath(path, key)
+            const part = formatText(key, config.key, newPath) + config.colon(':') + ' ' + doPrint(value, newPath)
             output += indent(part, config.space)
             output += i++ < len - 1 ? config.comma(',') : ''
             output += eol()

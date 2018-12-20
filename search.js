@@ -1,6 +1,6 @@
 'use strict'
 const fs = require('fs')
-const { walk } = require('./helpers')
+const { walk, appendPath } = require('./helpers')
 
 function setup(options = {}) {
   const { blessed, program, screen, box } = options
@@ -146,7 +146,7 @@ function find(source, query) {
       // ...but not object KEYS, which we have to check ourselves
       for (let [key, value] of Object.entries(v)) {
         if (regex.test(key)) {
-          path += '.' + key
+          path = appendPath(path, key)
           const route = paths.slice()
           route.push(path)
           hits.push({ path, route })

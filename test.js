@@ -1,6 +1,7 @@
 'use strict'
 const test = require('ava')
 const {execSync} = require('child_process')
+const { appendPath, popPath } = require('./helpers')
 
 function fx(json, code = '') {
   return execSync(`echo '${JSON.stringify(json)}' | node index.js ${code}`).toString('utf8')
@@ -55,5 +56,20 @@ test('search', t => {
   t.is(r, '[1]\n')
 
   r = fx(json, '--find /bar/i')
-  t.is(r, '[1]\n.[2].this.that[2]\n')
+  t.is(r, '[1]\n[2].this.that[2]\n')
+})
+
+test('appendPath', t => {
+  t.is('.', appendPath('', ''))
+  t.is('.foo', appendPath('', 'foo'))
+  t.is('.foo', appendPath('.', 'foo'))
+  t.is('.foo.bar', appendPath('.foo', 'bar'))
+  t.is('.foo["white space"]', appendPath('.foo', 'white space'))
+  t.is('.foo', appendPath('this', 'foo'))
+})
+
+test('popPath', t => {
+  t.is('.', popPath('.foo'))
+  t.is('.', popPath('.white space'))
+  t.is('.', popPath('.["white space"]'))
 })
