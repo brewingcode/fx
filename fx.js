@@ -198,8 +198,10 @@ module.exports = function start(filename, source) {
     box.emit('hidesearch')
     bar.show()
     if (input.getValue() === '') {
-      input.setValue('.')
-      complete('.')
+      const [n, line] = getLine(program.y)
+      const path = index.get(n)
+      input.setValue(path)
+      complete(path)
     }
     input.readInput()
     screen.render()
