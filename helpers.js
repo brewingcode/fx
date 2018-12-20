@@ -71,4 +71,14 @@ function popPath(path) {
   return path ? path.replace(/[\.\[][^\.\[]*$/, '') : '.'
 }
 
-module.exports = { walk, reduce, popPath }
+// append() to a path
+function appendPath(path, next) {
+  if (/^[a-z]\w*$/i.test(next)) {
+    next = '.' + next
+  } else {
+    next = `["${next}"]`
+  }
+  return path.replace(/\.\w*$/, next)
+}
+
+module.exports = { walk, reduce, popPath, appendPath }
