@@ -77,7 +77,7 @@ function appendPath(path, next) {
   if (/^(\.|this)$/.test(path)) {
     path = ''
   }
-  if (/\s/.test(next)) {
+  if (/\s/.test(next) || /^\d/.test(next)) {
     return path + `["${next}"]`
   }
   else {
