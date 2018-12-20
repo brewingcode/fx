@@ -185,8 +185,7 @@ module.exports = function start(filename, source) {
   })
 
   input.key('C-w', function () {
-    let code = input.getValue()
-    code = code.replace(/[\.\[][^\.\[]*$/, '')
+    const code = popPath(input.getValue())
     input.setValue(code)
     autocomplete.hide()
     screen.render()
@@ -338,6 +337,11 @@ module.exports = function start(filename, source) {
 
     render()
   })
+
+  // pop() the last bit off the path
+  function popPath(path) {
+    return path ? path.replace(/[\.\[][^\.\[]*$/, '') : '.'
+  }
 
   function getLine(y) {
     const dy = box.childBase + y
