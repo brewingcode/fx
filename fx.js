@@ -305,14 +305,31 @@ module.exports = function start(filename, source) {
   })
 
   box.key(['left', 'h'], function () {
-    const [n, line] = getLine(program.y)
-    program.showCursor()
-    program.cursorPos(program.y, line.search(/\S/))
-    const path = index.get(n)
-    if (expanded.has(path)) {
-      expanded.delete(path)
-      render()
+    let [n, line] = getLine(program.y)
+    let path = index.get(n)
+    const val = reduce(json, path)
+
+    if (val == null) {
+      path = popPath(path)
     }
+    else if (typeof val === 'object' && val.constructor === Object) {
+      // if this is already collapsed, go up a level
+      if (!expanded.has(path)) {
+        path = popPath(path)
+      }
+    }
+    else if (Array.isArray(val)) {
+      // if this is already collapsed, go up a level
+      if (!expanded.has(path)) {
+        path = popPath(path)
+      }
+    }
+    else {
+      path = popPath(path)
+    }
+
+    expanded.delete(path)
+    render({path})
   })
 
   box.on('click', function (mouse) {

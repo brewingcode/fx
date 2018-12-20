@@ -21,6 +21,7 @@ This is a fork of [antonmedv/fx](https://github.com/antonmedv/fx).
 - bottom bar behaves differently
 - slightly more modular require() structure, instead of everything being in
   `fx.js`
+- moving left on a leaf-node will collapse up to the parent node
 
 ### Additions
 
