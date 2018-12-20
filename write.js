@@ -14,6 +14,8 @@ function setup(options = {}) {
     width: '100%',
   })
 
+  filename.hide()
+
   box.key('w', function () {
     prompt.setContent('output:')
     bar.show()
