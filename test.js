@@ -73,3 +73,11 @@ test('popPath', t => {
   t.is('.', popPath('.white space'))
   t.is('.', popPath('.["white space"]'))
 })
+
+test('examples', t => {
+  t.is(fx({key:'value'}, "'x => x.key'"), 'value\n')
+  t.is(fx({key:'value'}, '.key'), 'value\n')
+  t.deepEqual(JSON.parse(fx([1,2,3,4,5,6], "'.map(x => x * 2)' '.filter(x => x % 3 == 0)'")), [6, 12])
+  t.is(fx({items: ['one', 'two']}, "'this.items' 'this[1]'"), 'two\n')
+  t.deepEqual(JSON.parse(fx({count: 0}, "'{...this, count: 1}'")), {count: 1})
+})
