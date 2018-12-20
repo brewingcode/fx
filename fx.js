@@ -322,9 +322,9 @@ module.exports = function start(filename, source) {
       return
     }
 
-    program.hideCursor()
     program.cursorPos(mouse.y, line.search(/\S/))
     autocomplete.hide()
+    screen.render()
     const path = index.get(n)
     if (expanded.has(path)) {
       expanded.delete(path)
