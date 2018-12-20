@@ -40,3 +40,20 @@ test('chain', t => {
   const r = fx({"items": ["foo", "bar"]}, "'this.items' 'yield* this' 'x => x[1]'")
   t.deepEqual(r, 'bar\n')
 })
+
+test('search', t => {
+  const json = [
+    "foo",
+    "bar",
+    {
+      "this": {
+        "that": [ 3, 4, "BAR" ]
+      }
+    }
+  ]
+  let r = fx(json, '--find bar')
+  t.deepEqual(r, '[1]\n')
+
+  r = fx(json, '--find /bar/i')
+  t.deepEqual(r, '[1]\n[2].this.that[2]\n')
+})
