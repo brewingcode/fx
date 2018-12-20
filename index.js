@@ -18,38 +18,36 @@ const print = require('./print')
 const {reduce} = require('./helpers')
 
 const usage = `
-  Usage
-    $ fx [code ...]
+USAGE
+    $ fx FILENAME [CODE ...]
+    $ fx [CODE ...]
+    $ fx [ [ --find | -f ] QUERY ]
 
-  Examples
+EXAMPLES
     $ echo '{"key": "value"}' | fx 'x => x.key'
     value
 
     $ echo '{"key": "value"}' | fx .key
     value
 
-    $ echo '[1,2,3]' | fx 'this.map(x => x * 2)'
-    [2, 4, 6]
+    $ echo '[1,2,3,4,5,6]' | fx '.map(x => x * 2)' '.filter(x => x % 3 == 0)'
+    [6, 12]
 
     $ echo '{"items": ["one", "two"]}' | fx 'this.items' 'this[1]'
     two
 
     $ echo '{"count": 0}' | fx '{...this, count: 1}'
     {"count": 1}
+`.trim() + '\n'
 
-    $ echo '{"foo": 1, "bar": 2}' | fx ?
-    ["foo", "bar"]
-`
-
-function main(input) {
-  let args = minimist(process.argv.slice(2))
+function main(input, args) {
   let filename = 'fx'
   let exprs = []
 
   if (input === '') {
     if (args._.length === 0) {
       stderr.write(usage)
-      process.exit(2)
+      process.exit(1)
     }
 
     [ filename, ...exprs ] = args._
@@ -62,7 +60,7 @@ function main(input) {
 
   const json = JSON.parse(input)
 
-  const query = args.query || args.f
+  const query = args.find || args.f
   if (query) {
     // output paths to search hits
     const hits = search.find(json, query)
@@ -91,10 +89,16 @@ function main(input) {
 }
 
 function run() {
+  let args = minimist(process.argv.slice(2))
+  if (args.h || args.help) {
+    stdout.write(usage)
+    return
+  }
+
   stdin.setEncoding('utf8')
 
   if (stdin.isTTY) {
-    main('')
+    main('', args)
     return
   }
 
@@ -108,7 +112,7 @@ function run() {
   })
 
   stdin.on('end', () => {
-    main(buff)
+    main(buff, args)
   })
 }
 
