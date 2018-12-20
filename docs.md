@@ -168,7 +168,6 @@ Next commands available in interactive mode:
 | `.`                           | Edit filter                |
 | `/`                           | Search                     |
 | `n`/`p`                       | Next/previous result       |
-| `f`                           | Transfer search to filter  |
 | `w`                           | Write json to file         |
 
 These commands are available when entering text:

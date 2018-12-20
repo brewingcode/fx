@@ -21,14 +21,15 @@ This is a fork of [antonmedv/fx](https://github.com/antonmedv/fx).
 - bottom bar behaves differently
 - slightly more modular require() structure, instead of everything being in
   `fx.js`
-- moving left on a leaf-node will collapse up to the parent node
+- canceling the filter does not apply it
+- hitting "." loads the filter with the path under the cursor
 
 ### Additions
 
 - find is available via --find on the command line
-- key "f" will set the filter to the current find path
 - key "w" will write the current view to a file
 - fix initial `.[` and `[` in filter
+- moving left on a leaf-node will collapse up to the parent node
 
 ### Removals
 
