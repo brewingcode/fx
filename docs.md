@@ -189,8 +189,8 @@ will be used as a regex. The search is made against:
 - hash keys and values
 
 Note that the file written by the "w" action may not be valid JSON, because it
-looks exactly like what you see on screen; it might contains ellipses (`…`) to
-represent unexpanded branches.
+looks exactly like what you see on screen; it might contain unexpanded
+branches that display as `[ 3 ]` or `{ 3 }`.
 
 ### Selecting text
 
