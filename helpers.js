@@ -10,20 +10,20 @@ function walk(v, cb, path = '', paths = []) {
   paths.push(path)
 
   if (Array.isArray(v)) {
-    cb(path, v, paths)
+    cb(path, v, paths.slice())
     let i = 0
     for (let item of v) {
       walk(item, cb, path + '[' + (i++) + ']', paths)
     }
   }
   else if (typeof v === 'object' && v.constructor === Object) {
-    cb(path, v, paths)
+    cb(path, v, paths.slice())
     for (let [key, value] of Object.entries(v)) {
       walk(value, cb, appendPath(path, key), paths)
     }
   }
   else {
-    cb(path, v, paths)
+    cb(path, v, paths.slice())
   }
 
   paths.pop()

@@ -139,17 +139,13 @@ function find(source, query) {
       for (let [key, value] of Object.entries(v)) {
         if (regex.test(key)) {
           path = appendPath(path, key)
-          const route = paths.slice()
-          route.push(path)
-          hits.push({ path, route })
+          paths.push(path)
+          hits.push({ path, route:paths })
         }
       }
     }
     else if (typeof v === 'string' && regex.test(v)) {
-      hits.push({
-        path: path,
-        route: paths.slice(),
-      })
+      hits.push({ path, route:paths })
     }
   })
 

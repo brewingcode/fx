@@ -1,7 +1,7 @@
 'use strict'
 const test = require('ava')
 const {execSync} = require('child_process')
-const { appendPath, popPath } = require('./helpers')
+const { walk, appendPath, popPath } = require('./helpers')
 
 function fx(json, code = '') {
   return execSync(`echo '${JSON.stringify(json)}' | node index.js ${code}`).toString('utf8')
@@ -80,4 +80,23 @@ test('examples', t => {
   t.deepEqual(JSON.parse(fx([1,2,3,4,5,6], "'.map(x => x * 2)' '.filter(x => x % 3 == 0)'")), [6, 12])
   t.is(fx({items: ['one', 'two']}, "'this.items' 'this[1]'"), 'two\n')
   t.deepEqual(JSON.parse(fx({count: 0}, "'{...this, count: 1}'")), {count: 1})
+})
+
+test('walk', t => {
+  const callbacks = []
+  walk({a:1, b:[2,3,4], c:{d:"e", f:"g"}}, function(path, v, paths) {
+    // throw out v, no need to log/compare it as part of the test
+    callbacks.push([path, paths])
+  })
+  t.deepEqual(callbacks, [
+    [ '',      [ '' ]                ],
+    [ '.a',    [ '', '.a' ]          ],
+    [ '.b',    [ '', '.b' ]          ],
+    [ '.b[0]', [ '', '.b', '.b[0]' ] ],
+    [ '.b[1]', [ '', '.b', '.b[1]' ] ],
+    [ '.b[2]', [ '', '.b', '.b[2]' ] ],
+    [ '.c',    [ '', '.c' ]          ],
+    [ '.c.d',  [ '', '.c', '.c.d' ]  ],
+    [ '.c.f',  [ '', '.c', '.c.f' ]  ]
+  ])
 })
