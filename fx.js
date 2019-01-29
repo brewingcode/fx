@@ -3,7 +3,7 @@ const fs = require('fs')
 const tty = require('tty')
 const blessed = require('@medv/blessed')
 const stringWidth = require('string-width')
-const { walk, reduce } = require('./helpers')
+const { walk, reduce, popPath, appendPath } = require('./helpers')
 const print = require('./print')
 const search = require('./search')
 const write = require('./write')
@@ -123,15 +123,7 @@ module.exports = function start(filename, source) {
       apply(code)
     } else {
       // Autocomplete selected
-      let code = input.getValue()
-      let replace = autocomplete.getSelected()
-      if (/^[a-z]\w*$/i.test(replace)) {
-        replace = '.' + replace
-      } else {
-        replace = `["${replace}"]`
-      }
-      code = code.replace(/\.\w*$/, replace)
-
+      const code = appendPath(input.getValue(), autocomplete.getSelected())
       input.setValue(code)
       autocomplete.hide()
       update(code)
@@ -343,10 +335,6 @@ module.exports = function start(filename, source) {
     render()
   })
 
-  // pop() the last bit off the path
-  function popPath(path) {
-    return path ? path.replace(/[\.\[][^\.\[]*$/, '') : '.'
-  }
 
   function getLine(y) {
     const dy = box.childBase + y

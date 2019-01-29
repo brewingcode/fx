@@ -1,6 +1,7 @@
 'use strict'
 const test = require('ava')
 const {execSync} = require('child_process')
+const { walk, appendPath, popPath } = require('./helpers')
 
 function fx(json, code = '') {
   return execSync(`echo '${JSON.stringify(json)}' | node index.js ${code}`).toString('utf8')
@@ -13,17 +14,17 @@ test('pass', t => {
 
 test('anon func', t => {
   const r = fx({"key": "value"}, "'function (x) { return x.key }'")
-  t.deepEqual(r, 'value\n')
+  t.is(r, 'value\n')
 })
 
 test('arrow func', t => {
   const r = fx({"key": "value"}, "'x => x.key'")
-  t.deepEqual(r, 'value\n')
+  t.is(r, 'value\n')
 })
 
 test('arrow func ()', t => {
   const r = fx({"key": "value"}, "'(x) => x.key'")
-  t.deepEqual(r, 'value\n')
+  t.is(r, 'value\n')
 })
 
 test('this bind', t => {
@@ -38,5 +39,64 @@ test('generator', t => {
 
 test('chain', t => {
   const r = fx({"items": ["foo", "bar"]}, "'this.items' 'yield* this' 'x => x[1]'")
-  t.deepEqual(r, 'bar\n')
+  t.is(r, 'bar\n')
+})
+
+test('search', t => {
+  const json = [
+    "foo",
+    "bar",
+    {
+      "this": {
+        "that": [ 3, 4, "BAR" ]
+      }
+    }
+  ]
+  let r = fx(json, '--find bar')
+  t.is(r, '[1]\n')
+
+  r = fx(json, '--find /bar/i')
+  t.is(r, '[1]\n[2].this.that[2]\n')
+})
+
+test('appendPath', t => {
+  t.is('.', appendPath('', ''))
+  t.is('.foo', appendPath('', 'foo'))
+  t.is('.foo', appendPath('.', 'foo'))
+  t.is('.foo.bar', appendPath('.foo', 'bar'))
+  t.is('.foo["white space"]', appendPath('.foo', 'white space'))
+  t.is('.foo', appendPath('this', 'foo'))
+})
+
+test('popPath', t => {
+  t.is('.', popPath('.foo'))
+  t.is('.', popPath('.white space'))
+  t.is('.', popPath('.["white space"]'))
+})
+
+test('examples', t => {
+  t.is(fx({key:'value'}, "'x => x.key'"), 'value\n')
+  t.is(fx({key:'value'}, '.key'), 'value\n')
+  t.deepEqual(JSON.parse(fx([1,2,3,4,5,6], "'.map(x => x * 2)' '.filter(x => x % 3 == 0)'")), [6, 12])
+  t.is(fx({items: ['one', 'two']}, "'this.items' 'this[1]'"), 'two\n')
+  t.deepEqual(JSON.parse(fx({count: 0}, "'{...this, count: 1}'")), {count: 1})
+})
+
+test('walk', t => {
+  const callbacks = []
+  walk({a:1, b:[2,3,4], c:{d:"e", f:"g"}}, function(path, v, paths) {
+    // throw out v, no need to log/compare it as part of the test
+    callbacks.push([path, paths])
+  })
+  t.deepEqual(callbacks, [
+    [ '',      [ '' ]                ],
+    [ '.a',    [ '', '.a' ]          ],
+    [ '.b',    [ '', '.b' ]          ],
+    [ '.b[0]', [ '', '.b', '.b[0]' ] ],
+    [ '.b[1]', [ '', '.b', '.b[1]' ] ],
+    [ '.b[2]', [ '', '.b', '.b[2]' ] ],
+    [ '.c',    [ '', '.c' ]          ],
+    [ '.c.d',  [ '', '.c', '.c.d' ]  ],
+    [ '.c.f',  [ '', '.c', '.c.f' ]  ]
+  ])
 })

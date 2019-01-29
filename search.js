@@ -1,6 +1,6 @@
 'use strict'
 const fs = require('fs')
-const { walk } = require('./helpers')
+const { walk, appendPath } = require('./helpers')
 
 function setup(options = {}) {
   const { blessed, program, screen, box } = options
@@ -26,14 +26,14 @@ function setup(options = {}) {
   let boxLine = -1
   let hits = []
   let hitIndex = 0
-  let query = ''
+  let highlight = null
 
   function backToBox() {
     if (hits.length) {
       // render to the line of our current hit
       const hit = hits[hitIndex]
-      searchInput.setContent(`${hitIndex + 1} of ${hits.length} found: ${hit.path}`)
-      box.data.searchHit = { hit, highlight: str2regex(query) }
+      searchInput.setValue(`${hitIndex + 1} of ${hits.length} found: ${hit.path}`)
+      box.data.searchHit = { hit, highlight }
     }
     else {
       // render a clean view
@@ -48,12 +48,10 @@ function setup(options = {}) {
 
   box.key('/', function () {
     boxLine = program.y
-    if (query) {
-      searchInput.setContent(query)
-    }
     box.height = '100%-1'
     searchPrompt.show()
     searchInput.show()
+    searchInput.setValue('')
     searchInput.readInput()
     screen.render()
   })
@@ -75,25 +73,19 @@ function setup(options = {}) {
 
   searchInput.on('submit', function () {
     box.height = '100%-1'
-    if (query === searchInput.content) {
-      // no changes
-      backToBox()
+    const query = searchInput.getValue()
+    if (query) {
+      hits = find(source, query)
+      hitIndex = 0
+      highlight = str2regex(query)
+      if (hits.length === 0) {
+        searchInput.setContent('no hits found')
+      }
     }
     else {
-      // fresh search
-      query = searchInput.content
-      if (query) {
-        hits = find(source, query)
-        hitIndex = 0
-        if (hits.length === 0) {
-          searchInput.setContent('no hits found')
-        }
-      }
-      else {
-        hide()
-      }
-      backToBox()
+      hide()
     }
+    backToBox()
   })
 
   function hide() {
@@ -146,18 +138,14 @@ function find(source, query) {
       // ...but not object KEYS, which we have to check ourselves
       for (let [key, value] of Object.entries(v)) {
         if (regex.test(key)) {
-          path += '.' + key
-          const route = paths.slice()
-          route.push(path)
-          hits.push({ path, route })
+          path = appendPath(path, key)
+          paths.push(path)
+          hits.push({ path, route:paths })
         }
       }
     }
     else if (typeof v === 'string' && regex.test(v)) {
-      hits.push({
-        path: path,
-        route: paths.slice(),
-      })
+      hits.push({ path, route:paths })
     }
   })
 

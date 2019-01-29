@@ -29,6 +29,7 @@ This is a fork of [antonmedv/fx](https://github.com/antonmedv/fx).
 - find is available via --find on the command line
 - key "w" will write the current view to a file
 - fix initial `.[` and `[` in filter
+- fix keys that start with a digit
 - moving left on a leaf-node will collapse up to the parent node
 
 ### Removals

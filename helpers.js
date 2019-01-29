@@ -10,20 +10,20 @@ function walk(v, cb, path = '', paths = []) {
   paths.push(path)
 
   if (Array.isArray(v)) {
-    cb(path, v, paths)
+    cb(path, v, paths.slice())
     let i = 0
     for (let item of v) {
       walk(item, cb, path + '[' + (i++) + ']', paths)
     }
   }
   else if (typeof v === 'object' && v.constructor === Object) {
-    cb(path, v, paths)
+    cb(path, v, paths.slice())
     for (let [key, value] of Object.entries(v)) {
-      walk(value, cb, path + '.' + key, paths)
+      walk(value, cb, appendPath(path, key), paths)
     }
   }
   else {
-    cb(path, v, paths)
+    cb(path, v, paths.slice())
   }
 
   paths.pop()
@@ -66,4 +66,23 @@ function reduce(json, code) {
   return fn
 }
 
-module.exports = { walk, reduce }
+// pop() the last bit off the path
+function popPath(path) {
+  path = path ? path.replace(/[\.\[][^\.\[]*$/, '') : '.'
+  return path === '' ? '.' : path
+}
+
+// append() to a path
+function appendPath(path, next) {
+  if (/^(\.|this)$/.test(path)) {
+    path = ''
+  }
+  if (/\s/.test(next) || /^\d/.test(next)) {
+    return path + `["${next}"]`
+  }
+  else {
+    return path + '.' + next
+  }
+}
+
+module.exports = { walk, reduce, popPath, appendPath }
