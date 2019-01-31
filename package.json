@@ -41,14 +41,8 @@
     "@medv/blessed": "^2.0.0",
     "chalk": "^2.4.2",
     "indent-string": "^3.2.0",
-<<<<<<< HEAD
     "minimist": "^1.2.0",
-    "string-width": "^2.1.1"
-||||||| merged common ancestors
-    "string-width": "^2.1.1"
-=======
     "string-width": "^3.0.0"
->>>>>>> upstream/master
   },
   "devDependencies": {
     "ava": "^1.2.0",

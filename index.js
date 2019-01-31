@@ -45,13 +45,7 @@ function main(input, args) {
   let exprs = []
 
   if (input === '') {
-<<<<<<< HEAD
     if (args._.length === 0) {
-||||||| merged common ancestors
-    if (args.length === 0) {
-=======
-    if (args.length === 0 || (args.length === 1 && (args[0] === '-h' || args[0] === '--help'))) {
->>>>>>> upstream/master
       stderr.write(usage)
       process.exit(1)
     }

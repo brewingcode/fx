@@ -22,21 +22,7 @@ module.exports = function start(filename, source) {
   const expanded = new Set()
   expanded.add('')
 
-<<<<<<< HEAD
   const ttyFd = fs.openSync('/dev/tty', 'r+')
-||||||| merged common ancestors
-  // Current search regexp and generator.
-  let highlight = null
-  let findGen = null
-  let currentPath = null
-
-  const ttyFd = fs.openSync('/dev/tty', 'r+')
-=======
-  // Current search regexp and generator.
-  let highlight = null
-  let findGen = null
-  let currentPath = null
-
   // Reopen tty
   let ttyReadStream
   let ttyWriteStream
@@ -50,7 +36,6 @@ module.exports = function start(filename, source) {
     ttyWriteStream = tty.WriteStream(ttyFd)
   }
 
->>>>>>> upstream/master
   const program = blessed.program({
     input: ttyReadStream,
     output: ttyWriteStream,
@@ -483,61 +468,7 @@ module.exports = function start(filename, source) {
     }
 
     box.setContent(content)
-<<<<<<< HEAD
-||||||| merged common ancestors
-    screen.render()
-  }
 
-  render()
-}
-
-function walk(v, cb, path = '') {
-  if (!v) {
-    return
-  }
-=======
-    screen.render()
-  }
-
-  render()
-}
-
-function* bfs(json) {
-  const queue = [[json, '']]
-
-  while (queue.length > 0) {
-    const [v, path] = queue.shift()
-
-    if (!v) {
-      continue
-    }
-
-    if (Array.isArray(v)) {
-      yield path
-      let i = 0
-      for (let item of v) {
-        const p = path + '[' + (i++) + ']'
-        queue.push([item, p])
-      }
-    }
-
-    if (typeof v === 'object' && v.constructor === Object) {
-      yield path
-      for (let [key, value] of Object.entries(v)) {
-        const p = path + '.' + key
-        queue.push([value, p])
-      }
-    }
-  }
-}
-
-function* dfs(v, path = '') {
-  if (!v) {
-    return
-  }
->>>>>>> upstream/master
-
-<<<<<<< HEAD
     if (path) {
       const m = [...index].find(pair => pair[1] === path)
       if (m) {
@@ -547,39 +478,10 @@ function* dfs(v, path = '') {
         box.scrollTo(y)
         program.cursorPos(y - box.childBase + 1, line ? line.search(/\S/) : 0)
       }
-||||||| merged common ancestors
-  if (Array.isArray(v)) {
-    cb(path)
-    let i = 0
-    for (let item of v) {
-      walk(item, cb, path + '[' + (i++) + ']')
-=======
-  if (Array.isArray(v)) {
-    yield path
-    let i = 0
-    for (let item of v) {
-      yield* dfs(item, path + '[' + (i++) + ']')
->>>>>>> upstream/master
     }
 
-<<<<<<< HEAD
     screen.render()
-||||||| merged common ancestors
-  if (typeof v === 'object' && v.constructor === Object) {
-    cb(path)
-    let i = 0
-    for (let [key, value] of Object.entries(v)) {
-      walk(value, cb, path + '.' + key)
-    }
-=======
-  if (typeof v === 'object' && v.constructor === Object) {
-    yield path
-    for (let [key, value] of Object.entries(v)) {
-      yield* dfs(value, path + '.' + key)
-    }
->>>>>>> upstream/master
   }
 
   render()
 }
-
