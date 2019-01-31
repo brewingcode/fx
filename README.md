@@ -38,6 +38,28 @@ This is a fork of [antonmedv/fx](https://github.com/antonmedv/fx).
 - status bar
 - generator
 
+## Contributing
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/brewingcode/fx)
+
+Or clone locally and run:
+
+```bash
+# install dependencies
+npm install
+
+# run fx from node_modules
+npx fx package.json
+
+# or install globally and run anywhere
+npm link
+fx package.json
+
+# run the build binary
+npm run build
+./dist/fx-linux package.json
+```
+
 ## License
 
-[MIT](https://github.com/antonmedv/fx/blob/master/LICENSE)  
+[MIT](https://github.com/antonmedv/fx/blob/master/LICENSE)
