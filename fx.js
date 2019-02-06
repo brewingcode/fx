@@ -212,13 +212,7 @@ module.exports = function start(filename, source) {
 
   box.key('e', function () {
     expanded.clear()
-    for (let path of dfs(json)) {
-      if (expanded.size < 1000) {
-        expanded.add(path)
-      } else {
-        break
-      }
-    }
+    walk(json, path => expanded.size < 1000 && expanded.add(path))
     render()
   })
 
