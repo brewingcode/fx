@@ -81,7 +81,7 @@ function appendPath(path, next) {
     return path + `["${next}"]`
   }
   else {
-    return path + '.' + next
+    return path.replace(/\.*$/,  '.' + next)
   }
 }
 
