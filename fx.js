@@ -57,7 +57,7 @@ module.exports = function start(filename, source) {
     left: 0,
     top: 0,
     width: '100%',
-    height: '100%',
+    height: '100%-1',
     mouse: true,
     keys: true,
     vi: true,
@@ -82,7 +82,7 @@ module.exports = function start(filename, source) {
     left: 0,
     height: 1,
     width: 8,
-    content: 'filter:',
+    content: 'path:',
   })
 
   const input = blessed.textbox({
@@ -119,7 +119,6 @@ module.exports = function start(filename, source) {
 
   screen.title = filename
   box.focus()
-  bar.hide()
   autocomplete.hide()
   search.setup({blessed, program, screen, box, source})
 
@@ -155,7 +154,6 @@ module.exports = function start(filename, source) {
       // Autocomplete not selected
       autocomplete.hide()
     }
-    bar.hide()
     box.focus()
     screen.render()
   })
@@ -203,7 +201,6 @@ module.exports = function start(filename, source) {
   box.key('.', function () {
     box.height = '100%-1'
     box.emit('hidesearch')
-    bar.show()
     if (input.getValue() === '') {
       const [n, line] = getLine(program.y)
       const path = index.get(n)
@@ -376,7 +373,6 @@ module.exports = function start(filename, source) {
       }
     } else {
       box.height = '100%'
-      bar.hide()
       json = source
     }
     box.emit('updatesearchsource', json)
