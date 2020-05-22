@@ -9,6 +9,10 @@ const search = require('./search')
 const write = require('./write')
 const config = require('./config')
 
+function log(s) {
+  fs.appendFileSync('/tmp/fx.log', s.replace(/\n*$/, '\n'));
+}
+
 module.exports = function start(filename, source) {
   // Current rendered object on a screen.
   let json = source
