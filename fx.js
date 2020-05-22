@@ -8,6 +8,7 @@ const print = require('./print')
 const search = require('./search')
 const write = require('./write')
 const config = require('./config')
+const clip = require('clipboardy')
 
 function log(s) {
   fs.appendFileSync('/tmp/fx.log', s.replace(/\n*$/, '\n'));
@@ -328,6 +329,10 @@ module.exports = function start(filename, source) {
     expanded.delete(path)
     render({path})
     updatePath()
+  })
+
+  box.key(['c'], function () {
+    clip.writeSync(input.getValue())
   })
 
   box.on('click', function (mouse) {
