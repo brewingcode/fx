@@ -261,6 +261,8 @@ module.exports = function start(filename, source) {
       const line = box.getScreenLine(y + box.childBase)
       program.cursorPos(y, line.search(/\S/))
     }
+
+    updatePath()
   })
 
   box.key(['down', 'j'], function () {
@@ -285,6 +287,7 @@ module.exports = function start(filename, source) {
       const line = box.getScreenLine(y + box.childBase)
       program.cursorPos(y, line.search(/\S/))
     }
+    updatePath()
   })
 
   box.key(['right', 'l'], function () {
@@ -296,13 +299,13 @@ module.exports = function start(filename, source) {
       expanded.add(path)
       render()
     }
+    updatePath()
   })
 
   box.key(['left', 'h'], function () {
     let [n, line] = getLine(program.y)
     let path = index.get(n)
     const val = reduce(json, path)
-
     if (val == null) {
       path = popPath(path)
     }
@@ -324,6 +327,7 @@ module.exports = function start(filename, source) {
 
     expanded.delete(path)
     render({path})
+    updatePath()
   })
 
   box.on('click', function (mouse) {
@@ -341,6 +345,7 @@ module.exports = function start(filename, source) {
     } else {
       expanded.add(path)
     }
+    updatePath()
 
     box.data.searchHit = null
     box.emit('hidesearch')
@@ -475,6 +480,13 @@ module.exports = function start(filename, source) {
     }
 
     screen.render()
+  }
+
+  function updatePath() {
+    const [n, line] = getLine(program.y)
+    const path = index.get(n)
+    input.setValue(path)
+    render()
   }
 
   render()
