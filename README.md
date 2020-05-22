@@ -15,10 +15,12 @@ This is a fork of [antonmedv/fx](https://github.com/antonmedv/fx).
 
 - find is plaintext by default, and regex if the query looks like a regex (ie
   `/\d+ items/i`)
-- find is synchronous, so that the total number of hits can be displayed
+- find is synchronous, so that the total number of hits can be displayed, and
+  you can move forward ("n") and backward ("p") through results
 - find displays the property/element chain of each hit
 - implement counts instead of ellipses (`{ 22 }` vs `{…}` and `[ 3 ]` vs `[…]`)
-- bottom bar behaves differently
+- bottom bar behaves differently: it shows all the time, and always reflects
+  the current path under the cursor
 - slightly more modular require() structure, instead of everything being in
   `fx.js`
 - canceling the filter does not apply it
@@ -28,6 +30,7 @@ This is a fork of [antonmedv/fx](https://github.com/antonmedv/fx).
 
 - find is available via --find on the command line
 - key "w" will write the current view to a file
+- key "c" will copy the current path to the clipboard
 - fix initial `.[` and `[` in filter
 - fix keys that start with a digit
 - moving left on a leaf-node will collapse up to the parent node
